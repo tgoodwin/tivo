@@ -5,10 +5,10 @@
 
 #include "mjson.h"
 
-static const int MAX_VALUE_LEN = 512; 
+static const int MAX_VALUE_LEN = 512;
 
 struct logline {
-    int id; 
+    int id;
     int event_type;
     char value[MAX_VALUE_LEN];
 };
@@ -57,7 +57,7 @@ struct logline* replay(int event_t, int last_read_idx) {
     size_t linecap = 0;
     ssize_t linelen;
     char *line = NULL;
-    
+
     fp = fopen("testlog.txt", "r");
     if (fp == NULL) {
         exit(EXIT_FAILURE);
@@ -92,6 +92,25 @@ struct logline* replay(int event_t, int last_read_idx) {
     return found;
 };
 
+int record(int event_t, char* val) {
+    int id = 1;
+
+    FILE* fp;
+    fp = fopen("testlog.txt", "a");
+    if (fp == NULL)
+        exit(EXIT_FAILURE);
+
+    struct logline *l = malloc(sizeof(struct logline));
+    l->id = id;
+    l->event_type = event_t;
+    strcpy(l->value, val);
+
+    char out[MAX_VALUE_LEN];
+    gen_logline(l, out);
+    fprintf(fp, "%s\n", out);
+    return 0;
+};
+
 int main(int argc, char *argv[]) {
     FILE* fp;
     size_t linecap = 0;
@@ -111,7 +130,6 @@ int main(int argc, char *argv[]) {
             char out[sizeof(struct logline)];
             gen_logline(l, out);
             puts(out);
-            puts("wrote it..");
         } else {
             printf("whoops: %s", json_error_string(status));
         }
@@ -125,6 +143,9 @@ int main(int argc, char *argv[]) {
 
     struct logline *ll = replay(2, 0);
     puts(ll->value);
+
+    char *val = "hello";
+    record(2, val);
 
     exit(EXIT_SUCCESS);
 }
