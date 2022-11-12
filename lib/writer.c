@@ -26,17 +26,37 @@ int parse_logline(const char* buf, struct logline *line) {
     return json_read_object(buf, json_attrs, NULL);
 };
 
+int gen_logline(struct logline *line, char* out) {
+    return sprintf(out, "{\"id\": %d, \"event_type\": %d, \"value\": \"%s\"}",
+            line->id, line->event_type, line->value);
+};
+
 int main(int argc, char *argv[]) {
     struct logline *l = malloc(sizeof(struct logline));
     int status = parse_logline(argv[1], l);
-    if (status == 0) {
-        printf("id..: %d\n", l->id);
-        printf("event_type: %d\n", l->event_type);
-        printf("value: %s\n", l->value);
+    /* if (status == 0) { */
+    /*     printf("id: %d\n", l->id); */
+    /*     printf("event_type: %d\n", l->event_type); */
+    /*     printf("value: %s\n", l->value); */
+    /* } else { */
+    /*     puts(json_error_string(status)); */
+    /* } */
+    char out[sizeof(struct logline)];
+    gen_logline(l, out);
+    puts(out);
+
+    struct logline *l2 = malloc(sizeof(struct logline));
+    int status2 = parse_logline(out, l2);
+    if (status2 == 0) {
+        printf("id: %d\n", l2->id);
+        printf("event_type: %d\n", l2->event_type);
+        printf("value: %s\n", l2->value);
     } else {
-        printf("why");
-        puts(json_error_string(status));
+        puts(json_error_string(status2));
     }
-    return status;
+    l2->id = 2;
+    char out2[sizeof(struct logline)];
+    gen_logline(l2, out2);
+    puts(out2);
 }
 
