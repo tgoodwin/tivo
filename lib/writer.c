@@ -1,3 +1,4 @@
+#include "writer.h"
 #define _GNU_SOURCE
 #include <pthread.h>
 #include <stdio.h>
@@ -5,10 +6,9 @@
 #include <string.h>
 
 #include "mjson.h"
-#include "writer.h"
 
 int __log_idx_counter;
-pthread_mutex_t idx_lock;
+pthread_mutex_t test_idx_lock;
 
 char *LOGFILE_ENV_VAR = "RR_LOGFILE";
 char *LOGFILE_NAME_DEFAULT = "rrlog.out";
@@ -42,16 +42,10 @@ int serialize_logline(struct logline *line, char *out) {
                  line->id, line->event_type, line->value);
 };
 
-struct logline *replay(int event_t, int last_read_idx) {
-  FILE *fp;
+struct logline *replay_from_file(FILE *fp, int event_t, int last_read_idx) {
   size_t linecap = 0;
   ssize_t linelen;
   char *line = NULL;
-  const char *fn = get_logfile();
-  fp = fopen(fn, "r");
-  if (fp == NULL) {
-    exit(EXIT_FAILURE);
-  }
 
   int curr_idx = 0;
   int status = 0;
@@ -76,32 +70,49 @@ struct logline *replay(int event_t, int last_read_idx) {
       puts(json_error_string(status));
     }
   }
+  return found;
+}
 
+struct logline *replay(int event_t, int last_read_idx) {
+  FILE *fp;
+  size_t linecap = 0;
+  ssize_t linelen;
+  char *line = NULL;
+  const char *fn = get_logfile();
+  fp = fopen(fn, "r");
+  if (fp == NULL) {
+    exit(EXIT_FAILURE);
+  }
+  struct logline *found = replay_from_file(fp, event_t, last_read_idx);
   close(fp);
   return found;
 };
 
-int record(int event_t, char *val) {
-  pthread_mutex_lock(&idx_lock);
-  FILE *fp;
-  const char *fn = get_logfile();
-  fp = fopen(fn, "a");
-  if (fp == NULL)
-    exit(EXIT_FAILURE);
-
+int record_to_file(FILE *fp, int record_idx, int event_t, char *val) {
   struct logline *l = malloc(sizeof(struct logline));
-  l->id = __log_idx_counter;
+  l->id = record_idx;
   l->event_type = event_t;
   strcpy(l->value, val);
 
   // render log line into buffer then flush it out to disk
   char out[MAX_VALUE_LEN];
   serialize_logline(l, out);
-  fprintf(fp, "%s\n", out);
+  free(l);
+  return fprintf(fp, "%s\n", out);
+}
 
+int record(int event_t, char *val) {
+  pthread_mutex_lock(&test_idx_lock);
+  FILE *fp;
+  const char *fn = get_logfile();
+  fp = fopen(fn, "a");
+  if (fp == NULL)
+    exit(EXIT_FAILURE);
+
+  record_to_file(fp, __log_idx_counter, event_t, val);
   __log_idx_counter++;
   close(fp);
-  pthread_mutex_unlock(&idx_lock);
+  pthread_mutex_unlock(&test_idx_lock);
 
   return 0;
 };
