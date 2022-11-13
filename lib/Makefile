@@ -1,7 +1,9 @@
 CFLAGS = -O
 
-all: main
+all: main test
 
 main:
-	clang writer.c mjson.c mjson.h
+	clang writer.c writer.h mjson.c mjson.h
 
+test:
+	clang writer_test.c writer.h mjson.c mjson.h
