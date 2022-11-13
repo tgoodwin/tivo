@@ -5,24 +5,20 @@
 
 #include "writer.h"
 
-pthread_mutex_t idx_lock;
+pthread_mutex_t test_idx_lock;
 
-int test_serialize(const char *buf) {
+int test_deserialize_logline() {
+  char *buf = "{\"id\": 1, \"event_type\": 1, \"value\"; \"hello\"}";
   struct logline *l = malloc(sizeof(struct logline));
   int status = deserialize_logline(buf, l);
-  if (status == 0) {
-    printf("id: %d\n", l->id);
-    printf("event_type: %d\n", l->event_type);
-    printf("value: %s\n", l->value);
-  } else {
-    puts(json_error_string(status));
+  int result = EXIT_SUCCESS;
+  if (status != 0)
+    result = EXIT_FAILURE;
+  if (l->id != 1 || l->event_type != 1 || strcmp(l->value, "hello") != 0) {
+    result = EXIT_FAILURE;
   }
-  // now serialize it back out
-  char out[sizeof(struct logline)];
-  serialize_logline(l, out);
-  puts(out);
   free(l);
-  return 0;
+  return result;
 };
 
 void *trythis() {
@@ -35,7 +31,7 @@ void *trythis() {
 int test_concurrent_record() {
   pthread_t tid[2];
 
-  if (pthread_mutex_init(&idx_lock, NULL) != 0) {
+  if (pthread_mutex_init(&test_idx_lock, NULL) != 0) {
     printf("\n mutex init failed");
     return EXIT_FAILURE;
   }
@@ -48,5 +44,12 @@ int test_concurrent_record() {
   }
   pthread_join(tid[0], NULL);
   pthread_join(tid[1], NULL);
-  pthread_mutex_destroy(&idx_lock);
+  pthread_mutex_destroy(&test_idx_lock);
+}
+
+int main(int argc, char *argv[]) {
+  int result = test_deserialize_logline();
+  if (result != 0) {
+    puts("test deserialize failed");
+  }
 }
