@@ -84,7 +84,7 @@ struct logline *replay(int event_t, int last_read_idx) {
     exit(EXIT_FAILURE);
   }
   struct logline *found = replay_from_file(fp, event_t, last_read_idx);
-  close(fp);
+  fclose(fp);
   return found;
 };
 
@@ -111,7 +111,7 @@ int record(int event_t, char *val) {
 
   record_to_file(fp, __log_idx_counter, event_t, val);
   __log_idx_counter++;
-  close(fp);
+  fclose(fp);
   pthread_mutex_unlock(&idx_lock);
 
   return 0;

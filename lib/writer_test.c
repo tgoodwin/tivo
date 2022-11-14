@@ -8,12 +8,13 @@
 pthread_mutex_t test_idx_lock;
 
 int test_deserialize_logline() {
-  char *buf = "{\"id\": 1, \"event_type\": 1, \"value\"; \"hello\"}";
+  char *buf = "{\"id\": 1, \"event_type\": 1, \"value\": \"hello\"}";
   struct logline *l = malloc(sizeof(struct logline));
   int status = deserialize_logline(buf, l);
   int result = EXIT_SUCCESS;
-  if (status != 0)
+  if (status != 0) {
     result = EXIT_FAILURE;
+  }
   if (l->id != 1 || l->event_type != 1 || strcmp(l->value, "hello") != 0) {
     result = EXIT_FAILURE;
   }
@@ -21,7 +22,7 @@ int test_deserialize_logline() {
   return result;
 };
 
-void *trythis() {
+void *threadtask() {
   char *val = "test test test";
   for (int i = 0; i < 10; i++) {
     record(2, val);
@@ -37,7 +38,7 @@ int test_concurrent_record() {
   }
   int error;
   for (int i = 0; i < 2; i++) {
-    error = pthread_create(&(tid[i]), NULL, &trythis, NULL);
+    error = pthread_create(&(tid[i]), NULL, &threadtask, NULL);
   }
   if (error != 0) {
     printf("failed to creat threads");
