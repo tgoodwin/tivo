@@ -8,7 +8,7 @@
 #include "mjson.h"
 
 int __log_idx_counter;
-pthread_mutex_t test_idx_lock;
+pthread_mutex_t idx_lock;
 
 char *LOGFILE_ENV_VAR = "RR_LOGFILE";
 char *LOGFILE_NAME_DEFAULT = "rrlog.out";
@@ -102,7 +102,7 @@ int record_to_file(FILE *fp, int record_idx, int event_t, char *val) {
 }
 
 int record(int event_t, char *val) {
-  pthread_mutex_lock(&test_idx_lock);
+  pthread_mutex_lock(&idx_lock);
   FILE *fp;
   const char *fn = get_logfile();
   fp = fopen(fn, "a");
@@ -112,7 +112,7 @@ int record(int event_t, char *val) {
   record_to_file(fp, __log_idx_counter, event_t, val);
   __log_idx_counter++;
   close(fp);
-  pthread_mutex_unlock(&test_idx_lock);
+  pthread_mutex_unlock(&idx_lock);
 
   return 0;
 };
