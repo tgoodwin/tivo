@@ -53,8 +53,8 @@ struct logline *replay_from_file(FILE *fp, int writer_id, int event_t,
   int status = 0;
 
   while ((linelen = getline(&line, &linecap, fp)) > 0) {
-    // skip over events we've seen already
     curr_idx++;
+    // skip over events we've seen already
     if (curr_idx <= last_read_idx) {
       continue;
     }
@@ -92,33 +92,33 @@ struct logline *replay(int writer_id, int event_t, int last_read_idx) {
   return found;
 };
 
-int record_to_file(FILE *fp, int record_idx, int writer_id, int event_t,
+int record_to_file(FILE *fp, int writer_id, int event_t,
                    char *val) {
   struct logline *l = malloc(sizeof(struct logline));
-  l->id = record_idx;
+  char out[MAX_VALUE_LEN];
+
+  pthread_mutex_lock(&idx_lock);
+  l->id = __log_idx_counter;
   l->writer_id = writer_id;
   l->event_type = event_t;
   strcpy(l->value, val);
 
   // render log line into buffer then flush it out to disk
-  char out[MAX_VALUE_LEN];
   serialize_logline(l, out);
+  fprintf(fp, "%s\n", out);
+  __log_idx_counter++;
+  pthread_mutex_unlock(&idx_lock);
   free(l);
-  return fprintf(fp, "%s\n", out);
+  return 0;
 };
 
 int record(int writer_id, int event_t, char *val) {
-  pthread_mutex_lock(&idx_lock);
-  FILE *fp;
   const char *fn = get_logfile();
+  FILE *fp;
   fp = fopen(fn, "a");
   if (fp == NULL)
     exit(EXIT_FAILURE);
 
-  record_to_file(fp, __log_idx_counter, writer_id, event_t, val);
-  __log_idx_counter++;
+  record_to_file(fp, writer_id, event_t, val);
   fclose(fp);
-  pthread_mutex_unlock(&idx_lock);
-
-  return 0;
 };
