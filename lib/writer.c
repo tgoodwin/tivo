@@ -47,15 +47,16 @@ struct logline *replay_from_file(FILE *fp, int event_t, int last_read_idx) {
   ssize_t linelen;
   char *line = NULL;
 
-  int curr_idx = 0;
+  // the log is zero-indexed
+  int curr_idx = -1;
   int status = 0;
-  struct logline *found;
 
-  while ((linelen = getline(&line, &linecap, fp)) != -1) {
-    curr_idx++;
+  while ((linelen = getline(&line, &linecap, fp)) > 0) {
     // skip over events we've seen already
-    if (curr_idx <= last_read_idx)
+    curr_idx++;
+    if (curr_idx <= last_read_idx) {
       continue;
+    }
 
     struct logline *l = malloc(sizeof(struct logline));
     status = deserialize_logline(line, l);
@@ -65,12 +66,13 @@ struct logline *replay_from_file(FILE *fp, int event_t, int last_read_idx) {
         free(l);
         continue;
       }
-      found = l;
+      // otherwise, we found what we want, return.
+      return l;
     } else {
       puts(json_error_string(status));
     }
   }
-  return found;
+  return NULL;
 }
 
 struct logline *replay(int event_t, int last_read_idx) {
