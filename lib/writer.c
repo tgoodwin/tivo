@@ -7,10 +7,10 @@
 
 #include "mjson.h"
 
-int __log_idx_counter;
-pthread_mutex_t idx_lock;
+static int __log_idx_counter;
+static pthread_mutex_t idx_lock;
 
-char *LOGFILE_ENV_VAR = "RR_LOGFILE";
+char *LOGFILE_ENV_VAR = "RR_LOGFILE_NAME";
 char *LOGFILE_NAME_DEFAULT = "rrlog.out";
 
 char *get_logfile() {
