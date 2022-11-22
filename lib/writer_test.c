@@ -37,7 +37,7 @@ void *replaytask(void *arg) {
   struct rr_ctx *ctx = (struct rr_ctx *)arg;
   int writer_id = ctx->writer_id;
   int event_t = ctx->writer_id; // just use this for now
-  int last_idx = -1;
+  int last_idx = 0;
   struct logline *l;
   do {
     l = replay(writer_id, event_t, last_idx);
@@ -97,10 +97,10 @@ int main(int argc, char *argv[]) {
   if (result != 0) {
     puts("test deserialize failed");
   }
-  // result = test_concurrent_record();
-  // if (result != 0) {
-  //   printf("\ntest concurrent record failed: %d\n", result);
-  // }
+  result = test_concurrent_record();
+  if (result != 0) {
+    printf("\ntest concurrent record failed: %d\n", result);
+  }
   struct logline *out = replay(0, 2, 13);
   if (out != NULL) {
     fprintf(stdout, "%s\n", out->value);

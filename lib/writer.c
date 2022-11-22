@@ -7,7 +7,7 @@
 
 #include "mjson.h"
 
-static int __log_idx_counter;
+static int __log_idx_counter = 1;
 static pthread_mutex_t idx_lock = PTHREAD_MUTEX_INITIALIZER;
 
 char *LOGFILE_ENV_VAR = "RR_LOGFILE_NAME";
@@ -43,13 +43,13 @@ int serialize_logline(struct logline *line, char *out) {
                  line->id, line->event_type, line->value);
 };
 
-struct logline *replay_from_file(FILE *fp, int writer_id, int event_t, int last_read_idx) {
+struct logline *replay_from_file(FILE *fp, int writer_id, int event_t,
+                                 int last_read_idx) {
   size_t linecap = 0;
   ssize_t linelen;
   char *line = NULL;
 
-  // the log is zero-indexed
-  int curr_idx = -1;
+  int curr_idx = 0;
   int status = 0;
 
   while ((linelen = getline(&line, &linecap, fp)) > 0) {
@@ -74,7 +74,7 @@ struct logline *replay_from_file(FILE *fp, int writer_id, int event_t, int last_
     }
   }
   return NULL;
-}
+};
 
 struct logline *replay(int writer_id, int event_t, int last_read_idx) {
   FILE *fp;
@@ -86,12 +86,14 @@ struct logline *replay(int writer_id, int event_t, int last_read_idx) {
   if (fp == NULL) {
     exit(EXIT_FAILURE);
   }
-  struct logline *found = replay_from_file(fp, writer_id, event_t, last_read_idx);
+  struct logline *found =
+      replay_from_file(fp, writer_id, event_t, last_read_idx);
   fclose(fp);
   return found;
 };
 
-int record_to_file(FILE *fp, int record_idx, int writer_id, int event_t, char *val) {
+int record_to_file(FILE *fp, int record_idx, int writer_id, int event_t,
+                   char *val) {
   struct logline *l = malloc(sizeof(struct logline));
   l->id = record_idx;
   l->writer_id = writer_id;
@@ -103,7 +105,7 @@ int record_to_file(FILE *fp, int record_idx, int writer_id, int event_t, char *v
   serialize_logline(l, out);
   free(l);
   return fprintf(fp, "%s\n", out);
-}
+};
 
 int record(int writer_id, int event_t, char *val) {
   pthread_mutex_lock(&idx_lock);
