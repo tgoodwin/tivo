@@ -5,7 +5,7 @@
 
 #include "writer.h"
 
-pthread_mutex_t test_idx_lock;
+static pthread_mutex_t test_idx_lock;
 
 int test_deserialize_logline() {
   char *buf = "{\"id\": 1, \"event_type\": 1, \"value\": \"hello\"}";
@@ -33,7 +33,7 @@ int test_concurrent_record() {
   pthread_t tid[2];
 
   if (pthread_mutex_init(&test_idx_lock, NULL) != 0) {
-    printf("\n mutex init failed");
+    puts("mutex init failed");
     return EXIT_FAILURE;
   }
   int error;
@@ -41,16 +41,22 @@ int test_concurrent_record() {
     error = pthread_create(&(tid[i]), NULL, &threadtask, NULL);
   }
   if (error != 0) {
-    printf("failed to creat threads");
+    puts("failed to create threads");
   }
   pthread_join(tid[0], NULL);
   pthread_join(tid[1], NULL);
   pthread_mutex_destroy(&test_idx_lock);
-}
+  return EXIT_SUCCESS;
+};
 
 int main(int argc, char *argv[]) {
   int result = test_deserialize_logline();
   if (result != 0) {
     puts("test deserialize failed");
   }
+  result = test_concurrent_record();
+  if (result != 0) {
+    printf("\ntest concurrent record failed: %d\n", result);
+  }
+  puts("all done!");
 }
