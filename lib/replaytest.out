@@ -1,8 +1,7 @@
-{"id": 0, "writer_id": 0, "event_type": 0, "value": "test test test 0"}
 {"id": 1, "writer_id": 2, "event_type": 2, "value": "test test test 1"}
 {"id": 2, "writer_id": 0, "event_type": 0, "value": "test test test 2"}
 {"id": 3, "writer_id": 2, "event_type": 2, "value": "test test test 3"}
-{"id": 4, "writer_id": 2, "event_type": 2, "value": "test test test 4"}
+{"id": 4, "writer_id": 0, "event_type": 0, "value": "test test test 4"}
 {"id": 5, "writer_id": 2, "event_type": 2, "value": "test test test 5"}
 {"id": 6, "writer_id": 1, "event_type": 1, "value": "test test test 6"}
 {"id": 7, "writer_id": 2, "event_type": 2, "value": "test test test 7"}
