@@ -34,8 +34,9 @@ void *threadtask() {
 
 void *replaytask(void *arg) {
   // sad!
-  int event_t = *((int *)arg);
-  int writer_id = 0;
+  struct rr_ctx *ctx = (struct rr_ctx *)arg;
+  int writer_id = ctx->writer_id;
+  int event_t = ctx->writer_id; // just use this for now
   int last_idx = -1;
   struct logline *l;
   do {
@@ -77,8 +78,9 @@ int test_concurrent_replay() {
   int err;
   for (int i = 0; i < NUM_THREADS; i++) {
     int *arg = malloc(sizeof(*arg));
-    *arg = i;
-    err = pthread_create(&(tid[i]), NULL, &replaytask, arg);
+    struct rr_ctx *ctx = malloc(sizeof(struct rr_ctx));
+    ctx->writer_id = i;
+    err = pthread_create(&(tid[i]), NULL, &replaytask, ctx);
     if (err != 0) {
       puts("failed to create task");
       return err;
