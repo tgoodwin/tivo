@@ -3,16 +3,16 @@ CFLAGS = -O
 all: main test
 
 main:
-	clang writer.c writer.h mjson.c mjson.h
+	clang writer.c mjson.c
 
 writer:
-	clang writer.c writer.h
+	clang writer.c
 
 mjson:
-	clang mjson.c mjson.h
+	clang mjson.c
 
 test: writer.o mjson.o
 	clang -o test writer_test.c writer.o mjson.o
 
 clean:
-	rm -f *.o test rrlog.out
+	rm -f *.o *.gch test rrlog.out
