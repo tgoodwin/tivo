@@ -15,4 +15,4 @@ test: writer.o mjson.o
 	clang -o test writer_test.c writer.o mjson.o
 
 clean:
-	rm -f *.o *.gch test rrlog.out
+	rm -f *.o test rrlog.out

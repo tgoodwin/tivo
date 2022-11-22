@@ -33,11 +33,12 @@ void *threadtask() {
 }
 
 void *replaytask(void *arg) {
-  // sad!
   struct rr_ctx *ctx = (struct rr_ctx *)arg;
   int writer_id = ctx->writer_id;
-  int event_t = ctx->writer_id; // just use this for now
-  int last_idx = 0;
+  // just use this for now.
+  // in practice, caller has local knowledge of which event_t is being replayed
+  int event_t = ctx->writer_id;
+  int last_idx = ctx->offsets_by_type[event_t];
   struct logline *l;
   do {
     l = replay(writer_id, event_t, last_idx);
@@ -77,7 +78,6 @@ int test_concurrent_replay() {
   pthread_t tid[NUM_THREADS];
   int err;
   for (int i = 0; i < NUM_THREADS; i++) {
-    int *arg = malloc(sizeof(*arg));
     struct rr_ctx *ctx = malloc(sizeof(struct rr_ctx));
     ctx->writer_id = i;
     err = pthread_create(&(tid[i]), NULL, &replaytask, ctx);
