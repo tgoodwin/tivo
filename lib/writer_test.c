@@ -5,6 +5,8 @@
 
 #include "writer.h"
 
+#define NUM_THREADS 4
+
 static pthread_mutex_t test_idx_lock;
 
 int test_deserialize_logline() {
@@ -29,25 +31,62 @@ void *threadtask() {
   }
 }
 
+void *replaytask(void *arg) {
+  // sad!
+  int event_t = *((int *)arg);
+  int last_idx = -1;
+  struct logline *l;
+  do {
+    l = replay(event_t, last_idx);
+    if (l != NULL) {
+      fprintf(stdout, "event_t: %d, idx: %d, val: %s\n", event_t, l->id,
+              l->value);
+      last_idx = l->id;
+    }
+  } while (l != NULL);
+  fprintf(stdout, "thread for event_t: %d is done\n", event_t);
+};
+
 int test_concurrent_record() {
-  pthread_t tid[2];
+  pthread_t tid[NUM_THREADS];
 
   if (pthread_mutex_init(&test_idx_lock, NULL) != 0) {
     puts("mutex init failed");
     return EXIT_FAILURE;
   }
   int error;
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < NUM_THREADS; i++) {
     error = pthread_create(&(tid[i]), NULL, &threadtask, NULL);
+    if (error != 0) {
+      puts("failed to create threads");
+      return error;
+    }
   }
-  if (error != 0) {
-    puts("failed to create threads");
+
+  for (int i = 0; i < NUM_THREADS; i++) {
+    pthread_join(tid[i], NULL);
   }
-  pthread_join(tid[0], NULL);
-  pthread_join(tid[1], NULL);
   pthread_mutex_destroy(&test_idx_lock);
   return EXIT_SUCCESS;
 };
+
+int test_concurrent_replay() {
+  pthread_t tid[NUM_THREADS];
+  int err;
+  for (int i = 0; i < NUM_THREADS; i++) {
+    int *arg = malloc(sizeof(*arg));
+    *arg = i;
+    err = pthread_create(&(tid[i]), NULL, &replaytask, arg);
+    if (err != 0) {
+      puts("failed to create task");
+      return err;
+    }
+  }
+  for (int i = 0; i < NUM_THREADS; i++) {
+    pthread_join(tid[i], NULL);
+  }
+  return EXIT_SUCCESS;
+}
 
 int main(int argc, char *argv[]) {
   int result = test_deserialize_logline();
@@ -57,6 +96,14 @@ int main(int argc, char *argv[]) {
   result = test_concurrent_record();
   if (result != 0) {
     printf("\ntest concurrent record failed: %d\n", result);
+  }
+  struct logline *out = replay(2, 13);
+  if (out != NULL) {
+    fprintf(stdout, "%s\n", out->value);
+  }
+  result = test_concurrent_replay();
+  if (result != 0) {
+    puts("test concurrent replay failed");
   }
   puts("all done!");
 }

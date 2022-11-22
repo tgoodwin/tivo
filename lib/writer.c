@@ -14,12 +14,12 @@ char *LOGFILE_ENV_VAR = "RR_LOGFILE_NAME";
 char *LOGFILE_NAME_DEFAULT = "rrlog.out";
 
 char *get_logfile() {
-    char *log_file_name = getenv(LOGFILE_ENV_VAR);
-    if (log_file_name) {
-        return log_file_name;
-    }
+  char *log_file_name = getenv(LOGFILE_ENV_VAR);
+  if (log_file_name) {
+    return log_file_name;
+  }
 
-    return LOGFILE_NAME_DEFAULT;
+  return LOGFILE_NAME_DEFAULT;
 }
 
 // read_logline reads an individual log line thats been
