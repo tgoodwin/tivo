@@ -26,18 +26,20 @@ int test_deserialize_logline() {
 
 void *threadtask() {
   char *val = "test test test";
+  int writer_id = 0;
   for (int i = 0; i < 10; i++) {
-    record(2, val);
+    record(0, 2, val);
   }
 }
 
 void *replaytask(void *arg) {
   // sad!
   int event_t = *((int *)arg);
+  int writer_id = 0;
   int last_idx = -1;
   struct logline *l;
   do {
-    l = replay(event_t, last_idx);
+    l = replay(writer_id, event_t, last_idx);
     if (l != NULL) {
       fprintf(stdout, "event_t: %d, idx: %d, val: %s\n", event_t, l->id,
               l->value);
@@ -93,11 +95,11 @@ int main(int argc, char *argv[]) {
   if (result != 0) {
     puts("test deserialize failed");
   }
-  result = test_concurrent_record();
-  if (result != 0) {
-    printf("\ntest concurrent record failed: %d\n", result);
-  }
-  struct logline *out = replay(2, 13);
+  // result = test_concurrent_record();
+  // if (result != 0) {
+  //   printf("\ntest concurrent record failed: %d\n", result);
+  // }
+  struct logline *out = replay(0, 2, 13);
   if (out != NULL) {
     fprintf(stdout, "%s\n", out->value);
   }
