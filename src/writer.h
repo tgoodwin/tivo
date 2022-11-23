@@ -6,6 +6,16 @@
 #define EXEC_MODE_RECORD 0
 #define EXEC_MODE_REPLAY 1
 
+char *LOGFILE_ENV_VAR = "RR_LOGFILE";
+char *RR_MODE_ENVVAR = "RR_MODE";
+
+/*
+ * to record:
+ * RR_MODE=0 RR_LOGFILE=mytest ./testprogram
+ * to replay:
+ * RR_MODE=1 RR_LOGFILE=mytest ./testprogram
+ */
+
 struct logline {
     int id;                         // used as a serial index
     int writer_id;                  // modeling this as an int for now
