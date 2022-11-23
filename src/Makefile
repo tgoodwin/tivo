@@ -15,6 +15,9 @@ mjson:
 test: writer.o mjson.o
 	clang -pthread -o test writer_test.c writer.o mjson.o
 
+cas: writer.o mjson.o
+	clang -pthread -o cas_test cas.c writer.o mjson.o
+
 .PHONY: clean
 clean:
-	rm -f *.o test rrlog.out
+	rm -f *.o test cas_test rrlog.out
