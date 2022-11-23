@@ -18,7 +18,7 @@ struct TivoPass : public FunctionPass {
   TivoPass() : FunctionPass(ID) {}
 
   virtual bool runOnFunction(Function &F) {
-    // if the function begins with the `__i_` prefix, skip
+    // if the function begins with the `__tivo_` prefix, skip
     if (F.getName().str().rfind("__tivo_", 0) == 0) {
       return false;
     }
@@ -37,23 +37,11 @@ struct TivoPass : public FunctionPass {
           // replace I with a function call
           errs() << "Replacing with a function call: " << I << "\n";
           IRBuilder<> builder(op);
-          // builder.SetInsertPoint(&B, ++builder.GetInsertPoint());
 
           Value *args[] = {op->getOperand(0), op->getOperand(1),
                            op->getOperand(2)};
 
           builder.CreateCall(logCASFunc, args);
-        }
-        if (auto *op = dyn_cast<BinaryOperator>(&I)) {
-          // Insert *after* `op`.
-          IRBuilder<> builder(op);
-          builder.SetInsertPoint(&B, ++builder.GetInsertPoint());
-
-          // Insert a call to our function.
-          Value *args[] = {op->getOperand(0), op->getOperand(1), op};
-          builder.CreateCall(logAddFunc, args);
-
-          return true;
         }
       }
     }
