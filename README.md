@@ -3,7 +3,12 @@ research project exploring record and replay at the LLVM level
 
 ## Building docker image
 ```
-docker build -t tivo .
+docker build -t tivo -f .devcontainer/Dockerfile .
+```
+
+## Running the container
+```bash
+docker run --rm -it tivo
 ```
 
 ## Build Tivo LLVM Pass
