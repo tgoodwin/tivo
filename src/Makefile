@@ -7,13 +7,13 @@ main:
 	clang writer.c mjson.c
 
 writer:
-	clang writer.c
+	clang -pthread writer.c
 
 mjson:
 	clang mjson.c
 
 test: writer.o mjson.o
-	clang -o test writer_test.c writer.o mjson.o
+	clang -pthread -o test writer_test.c writer.o mjson.o
 
 .PHONY: clean
 clean:
