@@ -1,0 +1,8 @@
+{
+  "C_Cpp.default.includePath": [
+    "/usr/include/llvm-14",
+    "/usr/include/llvm-c-14"
+  ],
+  "C_Cpp.clang_format_fallbackStyle": "Google",
+  "cmake.configureOnOpen": false
+}
