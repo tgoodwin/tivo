@@ -6,8 +6,8 @@
 #define EXEC_MODE_RECORD 0
 #define EXEC_MODE_REPLAY 1
 
-char *LOGFILE_ENV_VAR = "RR_LOGFILE";
-char *RR_MODE_ENVVAR = "RR_MODE";
+#define LOGFILE_ENV_VAR "RR_LOGFILE"
+#define RR_MODE_ENVVAR "RR_MODE"
 
 /*
  * to record:

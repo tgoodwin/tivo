@@ -10,7 +10,6 @@
 static int __log_idx_counter = 1;
 static pthread_mutex_t idx_lock = PTHREAD_MUTEX_INITIALIZER;
 
-char *LOGFILE_ENV_VAR = "RR_LOGFILE_NAME";
 char *LOGFILE_NAME_DEFAULT = "rrlog.out";
 
 char *get_logfile() {
