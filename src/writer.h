@@ -29,6 +29,8 @@ struct rr_ctx {
     int offsets_by_type[256]; // idx: event_t, val: last read idx
 };
 
+extern int rr_mode_from_env();
+
 extern int record(int writer_id, int event_t, char *val);
 struct logline* replay(int writer_id, int event_t, int last_read_idx);
 

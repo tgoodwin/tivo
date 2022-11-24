@@ -7,8 +7,7 @@
 bool __tivo_sync_bool_compare_and_swap_4(volatile int32_t *data,
                                          volatile int32_t expected,
                                          volatile int32_t desired) {
-  bool use_replay = getenv(RR_MODE_ENVVAR) == EXEC_MODE_REPLAY;
-  if (use_replay) {
+  if (rr_mode_from_env() == EXEC_MODE_REPLAY) {
     // TODO abstract away writer_id and last_read_idx
     struct logline *l = replay(0, 0, 0);
     char *res = l->value;

@@ -12,6 +12,14 @@ static pthread_mutex_t idx_lock = PTHREAD_MUTEX_INITIALIZER;
 
 char *LOGFILE_NAME_DEFAULT = "rrlog.out";
 
+int rr_mode_from_env() {
+  int default_mode = EXEC_MODE_RECORD;
+  if (getenv(RR_MODE_ENVVAR)) {
+    return atoi(getenv(RR_MODE_ENVVAR)) == EXEC_MODE_REPLAY;
+  }
+  return default_mode;
+};
+
 char *get_logfile() {
   char *log_file_name = getenv(LOGFILE_ENV_VAR);
   if (log_file_name) {
