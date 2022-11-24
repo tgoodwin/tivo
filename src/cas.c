@@ -8,6 +8,7 @@ bool __tivo_sync_bool_compare_and_swap_4(volatile int32_t *data,
                                          volatile int32_t expected,
                                          volatile int32_t desired) {
   if (rr_mode_from_env() == EXEC_MODE_REPLAY) {
+    puts("replaying from file!");
     // TODO abstract away writer_id and last_read_idx
     struct logline *l = replay(0, 0, 0);
     char *res = l->value;
@@ -16,7 +17,7 @@ bool __tivo_sync_bool_compare_and_swap_4(volatile int32_t *data,
     }
     return 1;
   }
-
+  puts("recording to file!");
   bool result = __sync_bool_compare_and_swap_4(data, expected, desired);
   char *res = "false";
   if (result)
@@ -30,4 +31,5 @@ bool __tivo_sync_bool_compare_and_swap_4(volatile int32_t *data,
 int main(int argc, char **argv) {
   int32_t data, expected, desired;
   int a = __sync_bool_compare_and_swap_4(&data, expected, desired);
+  printf("result: %d\n", a);
 }
