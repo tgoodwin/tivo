@@ -14,10 +14,10 @@ mjson:
 	clang mjson.c
 
 test: writer.o mjson.o
-	clang -pthread -o test writer_test.c writer.o mjson.o
+	$(CC) $(CFLAGS) -pthread -o test writer_test.c writer.o mjson.o
 
 cas: writer.o mjson.o
-	clang -pthread -o cas_test cas.c writer.o mjson.o
+	$(CC) $(CFLAGS) -pthread -o cas_test cas.c writer.o mjson.o
 
 .PHONY: clean
 clean:
