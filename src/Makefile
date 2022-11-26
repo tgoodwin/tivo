@@ -1,5 +1,5 @@
 CC = clang-14
-CFLAGS = -flegacy-pass-manager -Xclang -load -Xclang ../build/tivo-pass/libTivoPass.so -O
+CFLAGS = -flegacy-pass-manager -Xclang -load -Xclang ../build/tivo-pass/libTivoPass.so -O0
 
 .PHONY: all
 all: main test
