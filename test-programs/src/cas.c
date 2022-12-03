@@ -17,7 +17,7 @@ int atomic_add(int* ptr, int value)
     while(true) {
       int original_value = *ptr;
       int new_value = original_value + value;
-      int old = __tivo_sync_bool_compare_and_swap_4(ptr, original_value, new_value);
+      int old = __sync_bool_compare_and_swap_4(ptr, original_value, new_value);
           if (old == original_value) {
           return old; 
     }
